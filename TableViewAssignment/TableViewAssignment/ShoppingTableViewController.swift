@@ -7,17 +7,40 @@
 
 import UIKit
 
+struct ShoppingBag {
+    let shopItem: String
+    var isChecked: Bool
+    var isStarred: Bool
+    
+}
+
 class ShoppingTableViewController: UITableViewController {
     
     @IBOutlet var backgroundView: UIView!
     @IBOutlet var searchBarTextField: UITextField!
     @IBOutlet var searchButton: UIButton!
     
-    var shoppingList = [
-        "그립톡 구매하기",
-        "사이다 사기",
-        "아이패드 케이스 최저가 알아보기",
-        "양말",
+    var shoppingList: [ShoppingBag] = [
+        ShoppingBag(
+            shopItem: "그립톡 구매하기",
+            isChecked: false,
+            isStarred: false
+        ),
+        ShoppingBag(
+            shopItem: "사이다 사기",
+            isChecked: false,
+            isStarred: false
+        ),
+        ShoppingBag(
+            shopItem: "아이패드 케이스 최저가 알아보기",
+            isChecked: false,
+            isStarred: false
+        ),
+        ShoppingBag(
+            shopItem: "양말",
+            isChecked: false,
+            isStarred: false
+        ),
     ]
     
     override func viewDidLoad() {
@@ -51,22 +74,41 @@ class ShoppingTableViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "ShoppingTableViewCell", for: indexPath) as! ShoppingTableViewCell
         
-        cell.separatorInset = .init(top: 0, left: 12, bottom: 0, right: 12)
+        let checkStatus = shoppingList[indexPath.section].isChecked ? "checkmark.square.fill" : "checkmark.square"
         
-        cell.leadingButton.setImage(UIImage(systemName: "checkmark.square.fill"), for: .normal)
+        let starStatus = shoppingList[indexPath.section].isStarred ? "star.fill" : "star"
+
+        cell.leadingButton.tag = indexPath.section * 2
+        cell.leadingButton.setImage(UIImage(systemName: checkStatus), for: .normal)
         cell.leadingButton.setTitle("", for: .normal)
         cell.leadingButton.tintColor = .black
+        cell.leadingButton.addTarget(self, action: #selector(checkBoxOnClick), for: .touchUpInside) 
         
-        cell.trailingButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+        
+        cell.trailingButton.tag = indexPath.section * 2 + 1
+        cell.trailingButton.setImage(UIImage(systemName: starStatus), for: .normal)
         cell.trailingButton.setTitle("", for: .normal)
         cell.trailingButton.tintColor = .black
+        cell.trailingButton.addTarget(self, action: #selector(starOnClick), for: .touchUpInside)
         
-        cell.contentLabel.text = shoppingList[indexPath.section]
+        cell.contentLabel.text = shoppingList[indexPath.section].shopItem
         
         cell.backgroundColor = .systemGray6
         cell.layer.cornerRadius = 10
         
         return cell
+    }
+    
+    @objc func checkBoxOnClick(sender: UIButton) {
+        let index = sender.tag / 2
+        shoppingList[index].isChecked = !shoppingList[index].isChecked
+        tableView.reloadData()
+    }
+    
+    @objc func starOnClick(sender: UIButton) {
+        let index = (sender.tag - 1) / 2
+        shoppingList[index].isStarred = !shoppingList[index].isStarred
+        tableView.reloadData()
     }
     
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -85,7 +127,11 @@ class ShoppingTableViewController: UITableViewController {
     
     // 추가 버튼 눌렀을 때 동작
     @IBAction func addButtonOnTap(_ sender: UIButton) {
-        shoppingList.append(searchBarTextField.text!)
+        shoppingList.append(ShoppingBag(
+            shopItem: searchBarTextField.text!,
+            isChecked: false,
+            isStarred: false
+        ))
         tableView.reloadData()
         view.endEditing(true)
         
@@ -95,7 +141,11 @@ class ShoppingTableViewController: UITableViewController {
 
     // 키보드 return 눌렀을 때
     @IBAction func returnOnTap(_ sender: UITextField) {
-        shoppingList.append(searchBarTextField.text!)
+        shoppingList.append(ShoppingBag(
+            shopItem: searchBarTextField.text!,
+            isChecked: false,
+            isStarred: false
+        ))
         tableView.reloadData()
         view.endEditing(true)
         
